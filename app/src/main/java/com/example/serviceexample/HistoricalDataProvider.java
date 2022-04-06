@@ -26,6 +26,7 @@ public class HistoricalDataProvider extends ContentProvider {
     static final String ID = "id";
     static final String CLOSE = "close";
     static final String VOLUME = "volume";
+    static final String OPEN = "open";
 
     private static HashMap<String, String> HISTORY_PROJECTION_MAP;
 
@@ -33,7 +34,8 @@ public class HistoricalDataProvider extends ContentProvider {
     static final int HISTORY_ID = 2;
 
     static final UriMatcher uriMatcher;
-    static{
+
+    static {
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(PROVIDER_NAME, "history", HISTORY);
         uriMatcher.addURI(PROVIDER_NAME, "history/#", HISTORY_ID);
@@ -50,8 +52,8 @@ public class HistoricalDataProvider extends ContentProvider {
             " CREATE TABLE " + TABLE_NAME +
                     " (id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     " close DECIMAL(5,3) NOT NULL, " +
+                    " open DECIMAL(5,3) NOT NULL, " +
                     " volume DECIMAL(10,1) NOT NULL);";
-
 
     // helper class creates repo
 
@@ -67,7 +69,7 @@ public class HistoricalDataProvider extends ContentProvider {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS " +  TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
             onCreate(db);
         }
     }
@@ -79,7 +81,7 @@ public class HistoricalDataProvider extends ContentProvider {
         DatabaseHelper dbHelper = new DatabaseHelper(context);
         // create db if not exists
         db = dbHelper.getWritableDatabase();
-        return (db == null)? false:true;
+        return db != null;
 
     }
 
@@ -99,7 +101,7 @@ public class HistoricalDataProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection,String[] selectionArgs, String sortOrder) {
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setTables(TABLE_NAME);
@@ -109,16 +111,16 @@ public class HistoricalDataProvider extends ContentProvider {
                 qb.setProjectionMap(HISTORY_PROJECTION_MAP);
                 break;
             case HISTORY_ID:
-                qb.appendWhere( ID + "=" + uri.getPathSegments().get(1));
+                qb.appendWhere(ID + "=" + uri.getPathSegments().get(1));
                 break;
             default:
         }
 
-        if (sortOrder == null || sortOrder == ""){
+        if (sortOrder == null || sortOrder == "") {
             sortOrder = ID;
         }
 
-        Cursor c = qb.query(db, projection, selection, selectionArgs,null, null, sortOrder);
+        Cursor c = qb.query(db, projection, selection, selectionArgs, null, null, sortOrder);
 
         // register to watch a content URI for changes
         c.setNotificationUri(getContext().getContentResolver(), uri);
@@ -128,7 +130,7 @@ public class HistoricalDataProvider extends ContentProvider {
 
     @Override
     public String getType(Uri uri) {
-        switch (uriMatcher.match(uri)){
+        switch (uriMatcher.match(uri)) {
             // all records
             case HISTORY:
                 return "vnd.android.cursor.dir/vnd.com.example.provider.history";
