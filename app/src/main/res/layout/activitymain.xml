@@ -9,7 +9,7 @@
 
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="104dp"
@@ -24,12 +24,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/edit_ticker"
+        android:id="@+id/ticker_input"
         android:layout_width="272dp"
         android:layout_height="50dp"
         android:layout_marginStart="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="104dp"
+        android:autoText="false"
         android:background="@drawable/rounded_edittext"
         android:ems="10"
         android:hint="Ticket Symbol..."
@@ -37,6 +38,7 @@
         android:padding="15dp"
         android:radius="5dp"
         android:textColor="#FFFFFF"
+        android:textColorHint="#757575"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -48,7 +50,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginTop="99dp"
         android:text="+ Add"
-        app:layout_constraintStart_toEndOf="@+id/edit_ticker"
+        app:layout_constraintStart_toEndOf="@+id/ticker_input"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
@@ -59,6 +61,7 @@
         android:layout_marginEnd="24dp"
         android:layout_marginRight="24dp"
         android:background="#00FFFFFF"
+        android:contentDescription="download"
         android:minWidth="48dp"
         android:minHeight="48dp"
         android:src="@drawable/download"
@@ -80,41 +83,12 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:layout_width="370dp"
-        android:layout_height="120dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="194dp"
-        android:background="@drawable/rounded_container"
-        android:gravity="center|center_vertical"
-        android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/textview_first2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Total Annulized Return"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/textview_result"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="na"
-            android:textColor="#FFFFFF"
-            android:textSize="34sp" />
-    </LinearLayout>
-
-    <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="370dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginLeft="24dp"
-        android:layout_marginTop="328dp"
+        android:layout_marginTop="200dp"
         android:orientation="horizontal"
         android:paddingLeft="15dp"
         android:paddingTop="5dp"
@@ -124,7 +98,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/textView4"
+            android:id="@+id/ticket_label"
             android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -133,7 +107,7 @@
             android:textSize="14sp" />
 
         <TextView
-            android:id="@+id/textView5"
+            android:id="@+id/return_label"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -144,53 +118,59 @@
             android:textSize="14sp" />
 
         <TextView
-            android:id="@+id/textView6"
+            android:id="@+id/volatility_label"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Annual. Voliatility"
+            android:text="Annual. Volatility"
             android:textColor="@color/white"
             android:textSize="14sp" />
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="370dp"
+        android:layout_width="409dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginTop="360dp"
-        android:background="@drawable/rounded_ticket"
-        android:orientation="horizontal"
-        android:padding="15dp"
+        android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
-        <TextView
-            android:id="@+id/textView9"
-            android:layout_width="60dp"
+        <LinearLayout
+            android:layout_width="370dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="APLL"
-            android:textColor="@color/white" />
+            android:layout_marginStart="24dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/rounded_ticket"
+            android:orientation="horizontal"
+            android:padding="15dp">
 
-        <TextView
-            android:id="@+id/textView8"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="+34.8%"
-            android:textColor="@android:color/holo_red_light" />
+            <TextView
+                android:id="@+id/ticker"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="APLL"
+                android:textColor="@color/white" />
 
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="-0.8%"
-            android:textColor="@android:color/holo_green_light" />
+            <TextView
+                android:id="@+id/annual_return"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="+34.8%"
+                android:textColor="@android:color/holo_red_light" />
+
+            <TextView
+                android:id="@+id/annual_volatility"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="-0.8%"
+                android:textColor="@android:color/holo_green_light" />
+        </LinearLayout>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

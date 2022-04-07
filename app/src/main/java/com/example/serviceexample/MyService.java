@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Locale;
 
 
 public class MyService extends Service {
@@ -34,7 +35,6 @@ public class MyService extends Service {
     private static final int READ_TIMEOUT = 15000;
     private static final int CONNECTION_TIMEOUT = 15000;
 
-    private String ticker = "MSFT";
     private String token = "c8uo5g2ad3ibdduen72g"; // put your own token
 
     private final class ServiceHandler extends Handler {
@@ -46,16 +46,14 @@ public class MyService extends Service {
         public void handleMessage(Message msg) {
 
             // url to get historical data
-
+            String ticker = String.valueOf(msg.obj).toUpperCase();
             String stringUrl = "https://finnhub.io/api/v1/stock/candle?symbol=" + ticker
-                    + "&resolution=W&from=1631022248&to=1631627048&token=" + token;
+                    + "&resolution=D&from=1625097601&to=1640995199&token=" + token;
             String result;
             String inputLine;
 
             try {
-
                 // make GET requests
-
                 URL myUrl = new URL(stringUrl);
                 HttpURLConnection connection = (HttpURLConnection) myUrl.openConnection();
 
@@ -66,7 +64,6 @@ public class MyService extends Service {
                 connection.connect();
 
                 // store json string from GET response
-
                 InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
                 BufferedReader reader = new BufferedReader(streamReader);
                 StringBuilder stringBuilder = new StringBuilder();
@@ -90,49 +87,47 @@ public class MyService extends Service {
 
             JSONObject jsonObject = null;
             JSONArray jsonArrayClose = null;
-            JSONArray jsonArrayVolume = null;
+            JSONArray jsonArrayTime = null;
             JSONArray jsonArrayOpen = null;
 
             try {
                 jsonObject = new JSONObject(result);
                 jsonArrayClose = jsonObject.getJSONArray("c");
-                jsonArrayVolume = jsonObject.getJSONArray("v");
+                jsonArrayTime = jsonObject.getJSONArray("t");
                 jsonArrayOpen = jsonObject.getJSONArray("o");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
+            if(jsonArrayClose == null){
+                Log.v("error", "error occurred");
+            } else {
+                Log.v("close", String.valueOf(jsonArrayClose.length()));
+                Log.v("open", String.valueOf(jsonArrayOpen.length()));
+                try {
+                    for (int i = 0; i < jsonArrayClose.length(); i++) {
+                        double close = jsonArrayClose.getDouble(i);
+                        double open = jsonArrayOpen.getDouble(i);
+                        String time = jsonArrayTime.getString(i);
+                        Log.v("data", i + ":, c: " + close + " o: " + open + "t: " + time);
 
-            Log.v("close", String.valueOf(jsonArrayClose.length()));
-            Log.v("vol", String.valueOf(jsonArrayVolume.length()));
-            Log.v("open", String.valueOf(jsonArrayOpen.length()));
-
-            try {
-                for (int i = 0; i < jsonArrayClose.length(); i++) {
-                    double close = jsonArrayClose.getDouble(i);
-                    double volume = jsonArrayVolume.getDouble(i);
-                    double open = jsonArrayOpen.getDouble(i);
-
-                    Log.v("data", i + ":, c: " + close + " v: " + volume + " o: " + open);
-
-                    ContentValues values = new ContentValues();
-                    values.put(HistoricalDataProvider.CLOSE, close);
-                    values.put(HistoricalDataProvider.VOLUME, volume);
-                    values.put(HistoricalDataProvider.OPEN, open);
-                    getContentResolver().insert(HistoricalDataProvider.CONTENT_URI, values);
+                        ContentValues values = new ContentValues();
+                        values.put(HistoricalDataProvider.Name, ticker);
+                        values.put(HistoricalDataProvider.CLOSE, close);
+                        values.put(HistoricalDataProvider.OPEN, open);
+                        values.put(HistoricalDataProvider.TIME, time);
+                        getContentResolver().insert(HistoricalDataProvider.CONTENT_URI, values);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
 
             // broadcast message that download is complete
-
             Intent intent = new Intent("DOWNLOAD_COMPLETE");
             //intent.putStringArrayListExtra("test", (ArrayList<String>) test);
             sendBroadcast(intent);
-
             stopSelf(msg.arg1);
-
         }
     }
 
@@ -146,8 +141,10 @@ public class MyService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        ticker = intent.getStringExtra("ticker");
+        getContentResolver().delete(HistoricalDataProvider.CONTENT_URI, null, null);
         Toast.makeText(this, "download starting", Toast.LENGTH_SHORT).show();
+
+        String[] tickers = intent.getStringArrayExtra("tickers");
 
         Message msg = serviceHandler.obtainMessage();
         msg.arg1 = startId;

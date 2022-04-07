@@ -1,6 +1,5 @@
 package com.example.serviceexample;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,7 +9,6 @@ import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,67 +24,59 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals("DOWNLOAD_COMPLETE")) {
+            String ticker = intent.getStringExtra("ticker");
+            int result_id = intent.getIntExtra("result", 0);
+            int volatility_id  = intent.getIntExtra("volatility", 0 );
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    double sumOpen = 0;
-                    double sumClose = 0;
-                    List<Double> sumOpenCloseList = new ArrayList<>();
-                    int counter = 0;
+
                     Uri CONTENT_URI = Uri.parse("content://com.example.serviceexample.HistoricalDataProvider/history");
-                    TextView result = (TextView) ((Activity) context).findViewById(R.id.textview_result);
+                    TextView result = (TextView) ((Activity) context).findViewById(R.id.annual_return);
+                    TextView volatility = (TextView) ((Activity) context).findViewById(R.id.annual_volatility);
                     result.setText("Calculating...");
-                    double sum_price = 0.0;
-                    double sum_volume = 0.0;
-                    Cursor cursor = context.getContentResolver().query(CONTENT_URI, null, null, null, null);
+
+                    List<Double> sumOpenCloseList = new ArrayList<>();
+
+                    int count = 0;
+                    double totalRet = 0.0;
+                    double totalRetSqr = 0.0;
+
+                    Cursor cursor = context.getContentResolver().query(CONTENT_URI, null, "name like '%" + ticker +"%'", new String[]{ticker}, null);
                     if (cursor.moveToFirst()) {
-                        double close = cursor.getDouble(cursor.getColumnIndexOrThrow("close"));
-                        double volume = cursor.getDouble(cursor.getColumnIndexOrThrow("volume"));
-                        double open = cursor.getDouble(cursor.getColumnIndexOrThrow("open"));
-                        sum_price += close * volume;
-                        sum_volume += volume;
+                        double returns = cursor.getDouble(cursor.getColumnIndexOrThrow("returns"));
+                        totalRet += returns;
+                        totalRetSqr += returns * returns;
+                        count++;
                         while (!cursor.isAfterLast()) {
                             int id = cursor.getColumnIndex("id");
-                            close = cursor.getDouble(cursor.getColumnIndexOrThrow("close"));
-                            volume = cursor.getDouble(cursor.getColumnIndexOrThrow("volume"));
-                            open = cursor.getDouble(cursor.getColumnIndexOrThrow("open"));
-                            sumOpen += open;
-                            sumClose += close;
-                            sumOpenCloseList.add(close - open);
-                            sum_price += close * volume;
-                            sum_volume += volume;
-                            counter++;
+                            returns = cursor.getDouble(cursor.getColumnIndexOrThrow("returns"));
+                            totalRet += returns;
+                            totalRetSqr += returns * returns;
+                            count ++;
                             cursor.moveToNext();
-                            Log.v("data", close + "");
+                            Log.v("data", returns + "");
                         }
                     } else {
                         result.setText("No Records Found");
                     }
-                    double AnnualizedReturn = (Math.pow((sumOpen / sumClose), (double) 1 / (double) counter) - 1) * 100;
-                    double AnnualizedVolatility = (Math.sqrt((double) counter) * calculateSD(sumOpenCloseList));
 
-                    double vwap = sum_price / sum_volume;
-                    result.setText(String.format("%.2f", vwap));
+                    // Calculation of the annual values
+                    double c = (double)(count - 1);
+                    double avg = totalRet / c;
+                    double annRet = Math.sqrt(250) * avg;
+
+                    double var = totalRetSqr / c - avg * avg;
+                    double asd = Math.sqrt(250) * Math.sqrt(var);
+
+                    String toRet = String.format("%.2f", annRet*100.0);
+                    result.setText(toRet + "%");
+
+                    String toVRet = String.format("%.2f", asd*100.0);
+                    volatility.setText(toVRet + "%");
+                    Log.v("Download","Success");
                 }
             });
         }
     }
-
-    public static double calculateSD(List<Double> numArray) {
-        double sum = 0.0, standardDeviation = 0.0;
-        int length = numArray.size();
-
-        for (double num : numArray) {
-            sum += num;
-        }
-
-        double mean = sum / length;
-
-        for (double num : numArray) {
-            standardDeviation += Math.pow(num - mean, 2);
-        }
-
-        return Math.sqrt(standardDeviation / length);
-    }
-
 }

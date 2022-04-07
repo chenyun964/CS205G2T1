@@ -24,9 +24,10 @@ public class HistoricalDataProvider extends ContentProvider {
     static final Uri CONTENT_URI = Uri.parse(URL);
 
     static final String ID = "id";
+    static final String Name = "name";
     static final String CLOSE = "close";
-    static final String VOLUME = "volume";
     static final String OPEN = "open";
+    static  final String TIME = "time";
 
     private static HashMap<String, String> HISTORY_PROJECTION_MAP;
 
@@ -53,7 +54,8 @@ public class HistoricalDataProvider extends ContentProvider {
                     " (id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     " close DECIMAL(5,3) NOT NULL, " +
                     " open DECIMAL(5,3) NOT NULL, " +
-                    " volume DECIMAL(10,1) NOT NULL);";
+                    " time VARCHAR(255) NOT NULL," +
+                    " name VARCHAR(30) NOT NULL);";
 
     // helper class creates repo
 
