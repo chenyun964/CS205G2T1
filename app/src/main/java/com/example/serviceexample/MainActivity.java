@@ -2,6 +2,7 @@ package com.example.serviceexample;
 
 import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.Context;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,8 +12,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.database.Cursor;
+import android.media.Image;
+import android.net.Uri;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.serviceexample.*;
 
 public class MainActivity extends AppCompatActivity {
     private ImageButton start;
