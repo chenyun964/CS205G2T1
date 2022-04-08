@@ -26,8 +26,8 @@
         android:id="@+id/ticker_input"
         android:layout_width="272dp"
         android:layout_height="50dp"
-        android:layout_marginLeft="20dp"
         android:layout_marginStart="20dp"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="104dp"
         android:autoText="false"
         android:background="@drawable/rounded_edittext"
@@ -36,7 +36,7 @@
         android:inputType="textPersonName"
         android:padding="15dp"
         android:radius="5dp"
-        android:textColor="#FFFFFF"
+        android:textColor="#000000"
         android:textColorHint="#757575"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -53,13 +53,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/counter_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginLeft="24dp"
         android:layout_marginTop="165dp"
-        android:text="3 / 5 Ticket Added"
+        android:text="0 / 5 Ticket Added"
         android:textColor="#A6A6A6"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -112,15 +112,16 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/list_layout"
         android:layout_width="409dp"
-        android:layout_height="wrap_content"
+        android:layout_height="500dp"
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
         <LinearLayout
             android:layout_width="370dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_marginStart="24dp"
             android:layout_marginLeft="24dp"
             android:layout_marginTop="10dp"
