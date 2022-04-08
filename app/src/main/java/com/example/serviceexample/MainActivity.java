@@ -2,7 +2,6 @@ package com.example.serviceexample;
 
 import android.content.BroadcastReceiver;
 import android.content.Intent;
-import android.content.Context;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,19 +11,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.database.Cursor;
-import android.media.Image;
-import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.serviceexample.*;
-
 public class MainActivity extends AppCompatActivity {
-    private ImageButton start;
-    private Button calc;
+    private Button add_btn;
     private TextView result;
     private EditText ticker;
     private BroadcastReceiver myBroadcastReceiver;
@@ -35,27 +27,24 @@ public class MainActivity extends AppCompatActivity {
         // set up layout
         setContentView(R.layout.activitymain);
 
-        start = (ImageButton) findViewById(R.id.start_button);
-        calc = (Button) findViewById(R.id.calc_button);
+        add_btn = (Button) findViewById(R.id.add_btn);
         result = (TextView) findViewById(R.id.annual_return);
         ticker = (EditText) findViewById(R.id.ticker_input);
 
-        // start service, pass ticker info via an intent
-
-        start.setOnClickListener(new View.OnClickListener() {
+        // register broadcast receiver to get informed that data is downloaded so that we can calc
+        add_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String tickerText = ticker.getText().toString();
+                if (tickerText.matches("")) {
+                    Log.v("Input","Ticker input is empty");
+                    return;
+                }
+
                 Intent intent = new Intent(getApplicationContext(), MyService.class);
                 intent.putExtra("ticker", String.valueOf(ticker.getText()));
                 startService(intent);
-            }
-        });
 
-        // register broadcast receiver to get informed that data is downloaded so that we can calc
-
-        calc.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
                 result.setText("Waiting for data.. ");
                 myBroadcastReceiver = new MyBroadcastReceiver(new Handler(Looper.getMainLooper()));
                 registerReceiver(myBroadcastReceiver, new IntentFilter("DOWNLOAD_COMPLETE"));
