@@ -32,7 +32,6 @@ import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity {
     private Button addBtn;
-    private TextView result;
     private EditText ticker;
     private LinearLayout listView;
     private TextView countLabel;
@@ -53,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activitymain);
         listView = (LinearLayout) findViewById(R.id.list_layout);
         addBtn = (Button) findViewById(R.id.add_btn);
-        result = (TextView) findViewById(R.id.annual_return);
         ticker = (EditText) findViewById(R.id.ticker_input);
         countLabel = (TextView) findViewById(R.id.counter_label);
         listView.removeAllViews();
@@ -66,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int childCount = listView.getChildCount();
-                if (childCount >= 5) {
+                int childCount = listView.getChildCount() + 1;
+                if (childCount > 5) {
                     Log.v("Input", "Max ticket added");
                     return;
                 }
@@ -97,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 TextView nReturn = new TextView(MainActivity.this);
                 nReturn.setText("Calculating");
                 nReturn.setGravity(Gravity.CENTER);
+                nReturn.setId(childCount);
                 nReturn.setTextColor(Color.parseColor("#FFFF4444"));
                 nReturn.setLayoutParams(new TableLayout.LayoutParams(dpTopx(80, view), dpTopx(24, view), 1f));
 
@@ -104,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 TextView nVolat = new TextView(MainActivity.this);
                 nVolat.setText("Calculating");
                 nVolat.setGravity(Gravity.CENTER);
+                nVolat.setId(childCount * 10);
                 nVolat.setTextColor(Color.parseColor("#FF99CC00"));
                 nVolat.setLayoutParams(new TableLayout.LayoutParams(dpTopx(80, view), dpTopx(24, view), 1f));
 
@@ -112,16 +112,20 @@ public class MainActivity extends AppCompatActivity {
                 container.addView(nVolat);
 
                 listView.addView(container);
-                childCount += 1;
                 countLabel.setText(childCount + " / 5 Ticket Added");
                 ticker.setText("");
+
                 if (childCount >= 5) {
                     ticker.clearFocus();
                     hideSoftKeyboard(MainActivity.this, view);
                 }
+
                 Intent intent = new Intent(getApplicationContext(), MyService.class);
-                intent.putExtra("ticker", String.valueOf(nTicker.getText()));
+                intent.putExtra("ticker", tickerText);
+                intent.putExtra("id", String.valueOf(childCount));
+
                 Log.v("ticker", intent.getStringExtra("ticker"));
+
                 startService(intent);
             }
         });

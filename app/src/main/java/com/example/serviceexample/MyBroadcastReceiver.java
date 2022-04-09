@@ -8,7 +8,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,17 +26,19 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        System.out.println(intent.getAction());
         if (intent.getAction().equals("DOWNLOAD_COMPLETE") || intent.getAction().equals("DATA_EXIST")) {
             String ticker = intent.getStringExtra("ticker");
-            int result_id = intent.getIntExtra("result", 0);
-            int volatility_id = intent.getIntExtra("volatility", 0);
+            String view_id = intent.getStringExtra("id");
             handler.post(new Runnable() {
                 @Override
                 public void run() {
                     Uri CONTENT_URI = Uri.parse("content://com.example.serviceexample.HistoricalDataProvider/history");
-                    //TextView result = (TextView) ((Activity) context).findViewById(R.id.annual_return);
-                    //TextView volatility = (TextView) ((Activity) context).findViewById(R.id.annual_volatility);
+
+                    int txt_id = Integer.parseInt(view_id);
+                    Log.v("txt_id", String.valueOf(txt_id));
+                    TextView AnnualReturn = (TextView) ((Activity) context).findViewById(txt_id);
+
+                    TextView AnnualVolat = (TextView) ((Activity) context).findViewById(txt_id * 10);
 
                     int count = 0;
                     double totalRet = 0.0;
@@ -46,17 +51,15 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                         double open = cursor.getDouble(cursor.getColumnIndexOrThrow("open"));
                         double returns = (close - open) / open;
                         count++;
-                        Log.v("data", String.format("close: %.2f open: %.2f", close, open));
                         while (!cursor.isAfterLast()) {
                             int id = cursor.getColumnIndex("id");
                             close = cursor.getDouble(cursor.getColumnIndexOrThrow("close"));
                             open = cursor.getDouble(cursor.getColumnIndexOrThrow("open"));
                             returns = (close - open) / open;
-                            totalRet += returns; // TODO: Tian Hao Help me pls
-                            totalRetSqr += returns * returns; // TODO: Tian Hao Help me pls
+                            totalRet += returns;
+                            totalRetSqr += returns * returns;
                             count++;
                             cursor.moveToNext();
-                            Log.v("data", String.format("close: %.2f open: %.2f", close, open));
                         }
                     }
                     // Calculation of the annual values
@@ -68,10 +71,10 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
 
                     String toRet = String.format("%.2f", annRet * 100.0);
                     Log.v("toRet", toRet);
-                    //result.setText(toRet + "%");
+                    AnnualReturn.setText(toRet + "%");
 
                     String toVRet = String.format("%.2f", asd * 100.0);
-                    //volatility.setText(toVRet + "%");
+                    AnnualVolat.setText(toVRet + "%");
                     Log.v("toVRet", toVRet);
                 }
             });

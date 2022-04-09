@@ -103,7 +103,6 @@ public class MyService extends Service {
             if (jsonArrayClose == null) {
                 Log.v("error", "error occurred");
             } else {
-                Log.v("data length", String.valueOf(jsonArrayClose.length()));
                 try {
                     for (int i = 0; i < jsonArrayClose.length(); i++) {
                         double close = jsonArrayClose.getDouble(i);
@@ -122,8 +121,10 @@ public class MyService extends Service {
                     e.printStackTrace();
                 }
             }
+
             // broadcast message that download is complete
             Intent intent = new Intent("DOWNLOAD_COMPLETE");
+            intent.putExtra("id", msg.getData().getString("id"));
             sendBroadcast(intent);
 
             stopSelf(msg.arg1);
@@ -152,11 +153,13 @@ public class MyService extends Service {
             Bundle b = new Bundle();
             msg.arg1 = startId;
             b.putString("ticker", ticker);
+            b.putString("id",  intent.getStringExtra("id"));
             msg.setData(b);
             serviceHandler.sendMessage(msg);
         } else {
             newIntent.setAction("DATA_EXIST");
             newIntent.putExtra("ticker", ticker);
+            newIntent.putExtra("id", intent.getStringExtra("id"));
             sendBroadcast(newIntent);
         }
         cursor.close();
