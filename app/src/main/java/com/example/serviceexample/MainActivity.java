@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -16,19 +15,13 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
-import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.Locale;
-
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity {
     private Button addBtn;
@@ -46,8 +39,6 @@ public class MainActivity extends AppCompatActivity {
         i.addAction("DATA_EXIST");
         registerReceiver(myBroadcastReceiver, i);
 
-        ArrayList<LinearLayout> list = new ArrayList<>();
-
         // set up layout
         setContentView(R.layout.activitymain);
         listView = (LinearLayout) findViewById(R.id.list_layout);
@@ -56,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         countLabel = (TextView) findViewById(R.id.counter_label);
         listView.removeAllViews();
 
-        String uri = "@drawable/rounded_ticket";  // where myresource (without the extension) is the file
+        String uri = "@drawable/rounded_ticket";
         int imageResource = getResources().getIdentifier(uri, null, getPackageName());
 
 
@@ -64,64 +55,67 @@ public class MainActivity extends AppCompatActivity {
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Input validations
                 int childCount = listView.getChildCount() + 1;
                 if (childCount > 5) {
-                    Log.v("Input", "Max ticket added");
+                    Toast.makeText(MainActivity.this, "Only 5 ticker is allow", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 String tickerText = ticker.getText().toString().toUpperCase();
-                Log.v("Ticker Name:", tickerText);
                 if (tickerText.matches("")) {
-                    Log.v("Input", "Ticker input is empty");
+                    Toast.makeText(MainActivity.this, "Ticker input is empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
+                // Create container for text view
                 LinearLayout container = new LinearLayout(MainActivity.this);
                 container.setOrientation(LinearLayout.HORIZONTAL);
                 LayoutParams params = new LayoutParams(dpTopx(370, view), LayoutParams.WRAP_CONTENT);
                 params.setMargins(dpTopx(24, view), dpTopx(10, view), 0, 0);
                 container.setLayoutParams(params);
                 container.setPadding(dpTopx(15, view), dpTopx(15, view), dpTopx(15, view), dpTopx(15, view));
-
                 Drawable bg = getResources().getDrawable(imageResource);
                 container.setBackground(bg);
 
+                // Create text view for ticker
                 TextView nTicker = new TextView(MainActivity.this);
-                nTicker.setText(tickerText.toUpperCase(Locale.ROOT));
+                nTicker.setText(tickerText.toUpperCase());
                 nTicker.setTextColor(Color.parseColor("#FFFFFF"));
                 nTicker.setLayoutParams(new TableLayout.LayoutParams(dpTopx(60, view), dpTopx(24, view), 1f));
 
+                // Create text view for annual return
                 TextView nReturn = new TextView(MainActivity.this);
-                nReturn.setText("Calculating");
+                nReturn.setText("Downloading");
                 nReturn.setGravity(Gravity.CENTER);
                 nReturn.setId(childCount);
                 nReturn.setTextColor(Color.parseColor("#FFFF4444"));
                 nReturn.setLayoutParams(new TableLayout.LayoutParams(dpTopx(80, view), dpTopx(24, view), 1f));
 
-
+                // Create text view for annual volatility
                 TextView nVolat = new TextView(MainActivity.this);
-                nVolat.setText("Calculating");
+                nVolat.setText("Downloading");
                 nVolat.setGravity(Gravity.CENTER);
                 nVolat.setId(childCount * 10);
                 nVolat.setTextColor(Color.parseColor("#FFFFFF"));
                 nVolat.setLayoutParams(new TableLayout.LayoutParams(dpTopx(80, view), dpTopx(24, view), 1f));
 
+                // Add created element into container
                 container.addView(nTicker);
                 container.addView(nReturn);
                 container.addView(nVolat);
 
+                // Update UI
                 listView.addView(container);
-                countLabel.setText(childCount + " / 5 Ticket Added");
+                countLabel.setText(childCount + " / 5 Ticker Added");
                 ticker.setText("");
-
                 ticker.clearFocus();
                 hideSoftKeyboard(MainActivity.this, view);
 
+                // Invoke Service with ticker
                 Intent intent = new Intent(getApplicationContext(), MyService.class);
                 intent.putExtra("ticker", tickerText);
                 intent.putExtra("id", String.valueOf(childCount));
-
                 startService(intent);
             }
         });

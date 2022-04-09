@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -14,21 +13,14 @@ import android.os.Message;
 import android.os.Process;
 import android.util.Log;
 import android.widget.Toast;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Locale;
-
 
 public class MyService extends Service {
     private Looper serviceLooper;
@@ -148,7 +140,7 @@ public class MyService extends Service {
                 null);
 
         if (!cursor.moveToFirst()) {
-            Toast.makeText(this, "download starting", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Download Starting", Toast.LENGTH_SHORT).show();
             Message msg = serviceHandler.obtainMessage();
             Bundle b = new Bundle();
             msg.arg1 = startId;
@@ -174,6 +166,6 @@ public class MyService extends Service {
 
     @Override
     public void onDestroy() {
-        Toast.makeText(this, "download done", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Download Done", Toast.LENGTH_SHORT).show();
     }
 }
