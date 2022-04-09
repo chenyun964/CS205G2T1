@@ -44,22 +44,26 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                     if (cursor.moveToFirst()) {
                         double close = cursor.getDouble(cursor.getColumnIndexOrThrow("close"));
                         double open = cursor.getDouble(cursor.getColumnIndexOrThrow("open"));
+                        double returns = (close - open) / open;
                         count++;
+                        Log.v("data", String.format("close: %.2f open: %.2f", close, open));
                         while (!cursor.isAfterLast()) {
                             int id = cursor.getColumnIndex("id");
-                            totalRet += close - open; // TODO: Tian Hao Help me pls
-                            totalRetSqr += close * open; // TODO: Tian Hao Help me pls
+                            close = cursor.getDouble(cursor.getColumnIndexOrThrow("close"));
+                            open = cursor.getDouble(cursor.getColumnIndexOrThrow("open"));
+                            returns = (close - open) / open;
+                            totalRet += returns; // TODO: Tian Hao Help me pls
+                            totalRetSqr += returns * returns; // TODO: Tian Hao Help me pls
                             count++;
                             cursor.moveToNext();
                             Log.v("data", String.format("close: %.2f open: %.2f", close, open));
                         }
                     }
                     // Calculation of the annual values
-                    double c = (double) (count - 1);
-                    double avg = totalRet / c;
-                    double annRet = Math.sqrt(250) * avg;
+                    double avg = totalRet / (double) count;
+                    double annRet = 250 * avg;
 
-                    double var = totalRetSqr / c - avg * avg;
+                    double var = totalRetSqr / (double) count - avg * avg;
                     double asd = Math.sqrt(250) * Math.sqrt(var);
 
                     String toRet = String.format("%.2f", annRet * 100.0);
