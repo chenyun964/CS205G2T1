@@ -52,7 +52,7 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                         double returns = (close - open) / open;
                         count++;
                         while (!cursor.isAfterLast()) {
-                            int id = cursor.getColumnIndex("id");
+                            //int id = cursor.getColumnIndex("id");
                             close = cursor.getDouble(cursor.getColumnIndexOrThrow("close"));
                             open = cursor.getDouble(cursor.getColumnIndexOrThrow("open"));
                             returns = (close - open) / open;

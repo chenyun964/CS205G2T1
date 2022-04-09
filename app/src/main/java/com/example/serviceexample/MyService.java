@@ -125,6 +125,7 @@ public class MyService extends Service {
             // broadcast message that download is complete
             Intent intent = new Intent("DOWNLOAD_COMPLETE");
             intent.putExtra("id", msg.getData().getString("id"));
+            intent.putExtra("ticker", ticker);
             sendBroadcast(intent);
 
             stopSelf(msg.arg1);
