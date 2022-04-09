@@ -39,7 +39,7 @@ public class MyService extends Service {
     private static final int CONNECTION_TIMEOUT = 15000;
 
     private String ticker;
-    private String token = "c8uo5g2ad3ibdduen72g"; // put your own token
+    private String token = "c98k0bqad3ibrc52p340"; // put your own token
 
     private final class ServiceHandler extends Handler {
         public ServiceHandler(Looper looper) {
@@ -84,8 +84,7 @@ public class MyService extends Service {
                 Thread.currentThread().interrupt();
             }
 
-            // parse the json string into 'close' and 'volume' array
-
+            // parse the json string into 'close' and 'open' array
             JSONObject jsonObject = null;
             JSONArray jsonArrayClose = null;
             JSONArray jsonArrayTime = null;

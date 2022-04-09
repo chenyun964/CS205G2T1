@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                String tickerText = ticker.getText().toString();
+                String tickerText = ticker.getText().toString().toUpperCase();
                 Log.v("Ticker Name:", tickerText);
                 if (tickerText.matches("")) {
                     Log.v("Input", "Ticker input is empty");
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 nVolat.setText("Calculating");
                 nVolat.setGravity(Gravity.CENTER);
                 nVolat.setId(childCount * 10);
-                nVolat.setTextColor(Color.parseColor("#FF99CC00"));
+                nVolat.setTextColor(Color.parseColor("#FFFFFF"));
                 nVolat.setLayoutParams(new TableLayout.LayoutParams(dpTopx(80, view), dpTopx(24, view), 1f));
 
                 container.addView(nTicker);
@@ -115,16 +115,12 @@ public class MainActivity extends AppCompatActivity {
                 countLabel.setText(childCount + " / 5 Ticket Added");
                 ticker.setText("");
 
-                if (childCount >= 5) {
-                    ticker.clearFocus();
-                    hideSoftKeyboard(MainActivity.this, view);
-                }
+                ticker.clearFocus();
+                hideSoftKeyboard(MainActivity.this, view);
 
                 Intent intent = new Intent(getApplicationContext(), MyService.class);
                 intent.putExtra("ticker", tickerText);
                 intent.putExtra("id", String.valueOf(childCount));
-
-                Log.v("ticker", intent.getStringExtra("ticker"));
 
                 startService(intent);
             }

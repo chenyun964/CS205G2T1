@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
@@ -35,9 +36,8 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                     Uri CONTENT_URI = Uri.parse("content://com.example.serviceexample.HistoricalDataProvider/history");
 
                     int txt_id = Integer.parseInt(view_id);
-                    Log.v("txt_id", String.valueOf(txt_id));
-                    TextView AnnualReturn = (TextView) ((Activity) context).findViewById(txt_id);
 
+                    TextView AnnualReturn = (TextView) ((Activity) context).findViewById(txt_id);
                     TextView AnnualVolat = (TextView) ((Activity) context).findViewById(txt_id * 10);
 
                     int count = 0;
@@ -46,13 +46,13 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
 
                     Cursor cursor = context.getContentResolver().query(CONTENT_URI,
                             null, "name like '%" + ticker + "%'", new String[]{}, null);
+
                     if (cursor.moveToFirst()) {
                         double close = cursor.getDouble(cursor.getColumnIndexOrThrow("close"));
                         double open = cursor.getDouble(cursor.getColumnIndexOrThrow("open"));
                         double returns = (close - open) / open;
                         count++;
                         while (!cursor.isAfterLast()) {
-                            //int id = cursor.getColumnIndex("id");
                             close = cursor.getDouble(cursor.getColumnIndexOrThrow("close"));
                             open = cursor.getDouble(cursor.getColumnIndexOrThrow("open"));
                             returns = (close - open) / open;
@@ -61,7 +61,12 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                             count++;
                             cursor.moveToNext();
                         }
+                    } else {
+                        AnnualReturn.setText("Ticker not exist");
+                        AnnualVolat.setText("");
+                        return;
                     }
+
                     // Calculation of the annual values
                     double avg = totalRet / (double) count;
                     double annRet = 250 * avg;
@@ -70,12 +75,18 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                     double asd = Math.sqrt(250) * Math.sqrt(var);
 
                     String toRet = String.format("%.2f", annRet * 100.0);
-                    Log.v("toRet", toRet);
-                    AnnualReturn.setText(toRet + "%");
+
+                    if(annRet <= 0){
+                        AnnualReturn.setText(toRet + "%");
+                        AnnualReturn.setTextColor(Color.parseColor("#FFFF4444"));
+                    } else {
+                        AnnualReturn.setText("+" + toRet + "%");
+                        AnnualReturn.setTextColor(Color.parseColor("#FF99CC00"));
+                    }
 
                     String toVRet = String.format("%.2f", asd * 100.0);
                     AnnualVolat.setText(toVRet + "%");
-                    Log.v("toVRet", toVRet);
+
                 }
             });
         }
