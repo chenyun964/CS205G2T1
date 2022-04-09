@@ -40,9 +40,9 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                     TextView AnnualReturn = (TextView) ((Activity) context).findViewById(txt_id);
                     TextView AnnualVolat = (TextView) ((Activity) context).findViewById(txt_id * 10);
 
-                    int count = 0;
-                    double totalRet = 0.0;
-                    double totalRetSqr = 0.0;
+                    int count = 0;   // Store the number of days within the interval
+                    double totalRet = 0.0;   // Store the total percentage return within the interval
+                    double totalRetSqr = 0.0;   // Store the total (percentage return)^2 within the interval
 
                     Cursor cursor = context.getContentResolver().query(CONTENT_URI,
                             null, "name like '%" + ticker + "%'", new String[]{}, null);
@@ -50,7 +50,7 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                     if (cursor.moveToFirst()) {
                         double close = cursor.getDouble(cursor.getColumnIndexOrThrow("close"));
                         double open = cursor.getDouble(cursor.getColumnIndexOrThrow("open"));
-                        double returns = (close - open) / open;
+                        double returns = (close - open) / open;   // Calculate the percentage return of the day
                         count++;
                         while (!cursor.isAfterLast()) {
                             close = cursor.getDouble(cursor.getColumnIndexOrThrow("close"));
@@ -67,12 +67,13 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                         return;
                     }
 
-                    // Calculation of the annual values
-                    double avg = totalRet / (double) count;
-                    double annRet = 250 * avg;
+                    // Calculation of the annualized values
+                    double avg = totalRet / (double) count;   // Calculate average daily percentage return within the interval
+                    double annRet = 250 * avg;   // Calculate annual return, assuming 250 trading days per year
 
-                    double var = totalRetSqr / (double) count - avg * avg;
-                    double asd = Math.sqrt(250) * Math.sqrt(var);
+                    // Calculation of the annualized volatility
+                    double var = totalRetSqr / (double) count - avg * avg;  // formula: var = sum(ret^2) / count - avg^2
+                    double asd = Math.sqrt(250) * Math.sqrt(var);   // calculate annualized volatility, assuming 250 trading days per year
 
                     String toRet = String.format("%.2f", annRet * 100.0);
 
