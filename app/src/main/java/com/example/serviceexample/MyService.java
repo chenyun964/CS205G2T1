@@ -77,9 +77,7 @@ public class MyService extends Service {
 
                 reader.close();
                 streamReader.close();
-
                 result = stringBuilder.toString();
-
             } catch (IOException e) {
                 e.printStackTrace();
                 result = null;
@@ -105,14 +103,13 @@ public class MyService extends Service {
             if (jsonArrayClose == null) {
                 Log.v("error", "error occurred");
             } else {
-                Log.v("close", String.valueOf(jsonArrayClose.length()));
-                Log.v("open", String.valueOf(jsonArrayOpen.length()));
+                Log.v("data length", String.valueOf(jsonArrayClose.length()));
                 try {
                     for (int i = 0; i < jsonArrayClose.length(); i++) {
                         double close = jsonArrayClose.getDouble(i);
                         double open = jsonArrayOpen.getDouble(i);
                         String time = jsonArrayTime.getString(i);
-                        Log.v("data", i + ":, c: " + close + " o: " + open + "t: " + time);
+                        Log.v("data", i + ": c: " + close + ", o: " + open + ", t: " + time);
 
                         ContentValues values = new ContentValues();
                         values.put(HistoricalDataProvider.Name, ticker);
@@ -126,6 +123,9 @@ public class MyService extends Service {
                 }
             }
             // broadcast message that download is complete
+            Intent intent = new Intent("DOWNLOAD_COMPLETE");
+            sendBroadcast(intent);
+
             stopSelf(msg.arg1);
         }
     }
@@ -148,21 +148,18 @@ public class MyService extends Service {
 
         if (!cursor.moveToFirst()) {
             Toast.makeText(this, "download starting", Toast.LENGTH_SHORT).show();
-
             Message msg = serviceHandler.obtainMessage();
             Bundle b = new Bundle();
             msg.arg1 = startId;
             b.putString("ticker", ticker);
             msg.setData(b);
             serviceHandler.sendMessage(msg);
-            newIntent.setAction("DOWNLOAD_COMPLETE");
         } else {
             newIntent.setAction("DATA_EXIST");
+            newIntent.putExtra("ticker", ticker);
+            sendBroadcast(newIntent);
         }
         cursor.close();
-        newIntent.putExtra("ticker", ticker);
-
-        sendBroadcast(newIntent);
         return START_STICKY;
 
     }

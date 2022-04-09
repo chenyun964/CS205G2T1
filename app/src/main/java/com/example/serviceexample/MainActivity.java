@@ -41,6 +41,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        myBroadcastReceiver = new MyBroadcastReceiver(new Handler(Looper.getMainLooper()));
+        IntentFilter i = new IntentFilter();
+        i.addAction("DOWNLOAD_COMPLETE");
+        i.addAction("DATA_EXIST");
+        registerReceiver(myBroadcastReceiver, i);
+
         ArrayList<LinearLayout> list = new ArrayList<>();
 
         // set up layout
@@ -117,12 +123,6 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("ticker", String.valueOf(nTicker.getText()));
                 Log.v("ticker", intent.getStringExtra("ticker"));
                 startService(intent);
-
-                myBroadcastReceiver = new MyBroadcastReceiver(new Handler(Looper.getMainLooper()));
-                IntentFilter i = new IntentFilter();
-                i.addAction("DOWNLOAD_COMPLETE");
-                i.addAction("DATA_EXIST");
-                registerReceiver(myBroadcastReceiver, i);
             }
         });
     }
