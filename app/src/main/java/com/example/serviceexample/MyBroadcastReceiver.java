@@ -41,14 +41,10 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                             null, "name like '%" + ticker + "%'", new String[]{}, null);
 
                     if (cursor.moveToFirst()) {
-                        double close = cursor.getDouble(cursor.getColumnIndexOrThrow("close"));
-                        double open = cursor.getDouble(cursor.getColumnIndexOrThrow("open"));
-                        double returns = (close - open) / open;   // Calculate the percentage return of the day
-                        count++;
                         while (!cursor.isAfterLast()) {
-                            close = cursor.getDouble(cursor.getColumnIndexOrThrow("close"));
-                            open = cursor.getDouble(cursor.getColumnIndexOrThrow("open"));
-                            returns = (close - open) / open;
+                            double close = cursor.getDouble(cursor.getColumnIndexOrThrow("close"));
+                            double open = cursor.getDouble(cursor.getColumnIndexOrThrow("open"));
+                            double returns = (close - open) / open;
                             totalRet += returns;
                             totalRetSqr += returns * returns;
                             count++;
