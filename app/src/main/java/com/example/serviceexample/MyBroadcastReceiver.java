@@ -66,6 +66,7 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
 
                     String toRet = String.format("%.2f", annRet * 100.0);
 
+                    // Update UI with calculated result
                     if(annRet <= 0){
                         AnnualReturn.setText(toRet + "%");
                         AnnualReturn.setTextColor(Color.parseColor("#FFFF4444"));

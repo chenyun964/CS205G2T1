@@ -99,7 +99,6 @@ public class MyService extends Service {
                         double close = jsonArrayClose.getDouble(i);
                         double open = jsonArrayOpen.getDouble(i);
                         String time = jsonArrayTime.getString(i);
-                        Log.v("data", i + ": c: " + close + ", o: " + open + ", t: " + time);
 
                         ContentValues values = new ContentValues();
                         values.put(HistoricalDataProvider.Name, ticker);
@@ -135,10 +134,11 @@ public class MyService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String ticker = intent.getStringExtra("ticker");
         Intent newIntent = new Intent();
+        // Check if ticker data is already in db
         Cursor cursor = getContentResolver().query(HistoricalDataProvider.CONTENT_URI,
                 null, "name like '%" + ticker + "%'", new String[]{},
                 null);
-
+        // Download the ticker data if not exist
         if (!cursor.moveToFirst()) {
             Toast.makeText(this, "Download Starting", Toast.LENGTH_SHORT).show();
             Message msg = serviceHandler.obtainMessage();
@@ -149,6 +149,7 @@ public class MyService extends Service {
             msg.setData(b);
             serviceHandler.sendMessage(msg);
         } else {
+            // Ticker exist, directly move to calculation
             newIntent.setAction("DATA_EXIST");
             newIntent.putExtra("ticker", ticker);
             newIntent.putExtra("id", intent.getStringExtra("id"));
@@ -156,7 +157,6 @@ public class MyService extends Service {
         }
         cursor.close();
         return START_STICKY;
-
     }
 
     @Override

@@ -33,13 +33,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Initial a broadcast receiver with actions
         myBroadcastReceiver = new MyBroadcastReceiver(new Handler(Looper.getMainLooper()));
         IntentFilter i = new IntentFilter();
         i.addAction("DOWNLOAD_COMPLETE");
         i.addAction("DATA_EXIST");
         registerReceiver(myBroadcastReceiver, i);
 
-        // set up layout
+        // Set up layout
         setContentView(R.layout.activitymain);
         listView = (LinearLayout) findViewById(R.id.list_layout);
         addBtn = (Button) findViewById(R.id.add_btn);
@@ -50,8 +51,7 @@ public class MainActivity extends AppCompatActivity {
         String uri = "@drawable/rounded_ticket";
         int imageResource = getResources().getIdentifier(uri, null, getPackageName());
 
-
-        // register broadcast receiver to get informed that data is downloaded so that we can calc
+        // On "add" button click
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -121,11 +121,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // Hide the keyboard
     public static void hideSoftKeyboard(Activity activity, View view) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
     }
 
+    // Convert dp to px
     private int dpTopx(int dp, View view) {
         float scale = view.getContext().getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5f);
