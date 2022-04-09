@@ -156,10 +156,12 @@ public class MyService extends Service {
             msg.setData(b);
             serviceHandler.sendMessage(msg);
             newIntent.setAction("DOWNLOAD_COMPLETE");
+        } else {
+            newIntent.setAction("DATA_EXIST");
         }
         cursor.close();
-        newIntent.setAction("DATA_EXIST");
         newIntent.putExtra("ticker", ticker);
+
         sendBroadcast(newIntent);
         return START_STICKY;
 
