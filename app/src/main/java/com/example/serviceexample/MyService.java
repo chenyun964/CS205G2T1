@@ -31,7 +31,7 @@ public class MyService extends Service {
     private static final int CONNECTION_TIMEOUT = 15000;
 
     private String ticker;
-    private String token = "c98k0bqad3ibrc52p340"; // put your own token
+    final private String token = "c98k0bqad3ibrc52p340"; // put your own token
 
     private final class ServiceHandler extends Handler {
         public ServiceHandler(Looper looper) {

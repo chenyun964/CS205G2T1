@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#01041F"
-    tools:context=".FirstFragment">
-
+    tools:context=".MainActivity">
 
     <TextView
         android:layout_width="wrap_content"
@@ -29,7 +28,6 @@
         android:layout_marginStart="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="100dp"
-        android:autoText="false"
         android:background="@drawable/rounded_edittext"
         android:ems="10"
         android:hint="Ticker Symbol..."

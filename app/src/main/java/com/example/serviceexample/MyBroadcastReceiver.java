@@ -30,8 +30,8 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
 
                     int txt_id = Integer.parseInt(view_id);
 
-                    TextView AnnualReturn = (TextView) ((Activity) context).findViewById(txt_id);
-                    TextView AnnualVolat = (TextView) ((Activity) context).findViewById(txt_id * 10);
+                    TextView AnnualReturn = ((Activity) context).findViewById(txt_id);
+                    TextView AnnualVolat = ((Activity) context).findViewById(txt_id * 10);
 
                     int count = 0;   // Store the number of days within the interval
                     double totalRet = 0.0;   // Store the total percentage return within the interval
@@ -53,8 +53,10 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                     } else {
                         AnnualReturn.setText("Ticker not exist");
                         AnnualVolat.setText("");
+                        cursor.close();
                         return;
                     }
+                    cursor.close();
 
                     // Calculation of the annualized values
                     double avg = totalRet / (double) count;   // Calculate average daily percentage return within the interval
