@@ -30,7 +30,7 @@
             android:name=".HistoricalDataProvider"
             android:authorities="com.example.serviceexample.HistoricalDataProvider"
             android:enabled="true"
-            android:exported="true"></provider>
+            android:exported="true" />
         <receiver android:name=".MyBroadcastReceiver"
             tools:ignore="Instantiatable"
             android:exported="true">

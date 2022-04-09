@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -60,14 +62,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 int childCount = listView.getChildCount();
                 if (childCount >= 5) {
-                    Log.v("Input","Max ticket added");
+                    Log.v("Input", "Max ticket added");
                     return;
                 }
 
                 String tickerText = ticker.getText().toString();
                 Log.v("Ticker Name:", tickerText);
                 if (tickerText.matches("")) {
-                    Log.v("Input","Ticker input is empty");
+                    Log.v("Input", "Ticker input is empty");
                     return;
                 }
 
@@ -107,29 +109,30 @@ public class MainActivity extends AppCompatActivity {
                 childCount += 1;
                 countLabel.setText(childCount + " / 5 Ticket Added");
                 ticker.setText("");
-                if(childCount >= 5){
+                if (childCount >= 5) {
                     ticker.clearFocus();
                     hideSoftKeyboard(MainActivity.this, view);
                 }
+                Intent intent = new Intent(getApplicationContext(), MyService.class);
+                intent.putExtra("ticker", String.valueOf(nTicker.getText()));
+                Log.v("ticker", intent.getStringExtra("ticker"));
+                startService(intent);
 
-//                Intent intent = new Intent(getApplicationContext(), MyService.class);
-//                intent.putExtra("ticker", String.valueOf(ticker.getText()));
-//                startService(intent);
-//
-//                result.setText("Waiting for data.. ");
-//                myBroadcastReceiver = new MyBroadcastReceiver(new Handler(Looper.getMainLooper()));
-//                registerReceiver(myBroadcastReceiver, new IntentFilter("DOWNLOAD_COMPLETE"));
+                myBroadcastReceiver = new MyBroadcastReceiver(new Handler(Looper.getMainLooper()));
+                IntentFilter i = new IntentFilter();
+                i.addAction("DOWNLOAD_COMPLETE");
+                i.addAction("DATA_EXIST");
+                registerReceiver(myBroadcastReceiver, i);
             }
         });
     }
 
-    public static void hideSoftKeyboard (Activity activity, View view)
-    {
-        InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+    public static void hideSoftKeyboard(Activity activity, View view) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
     }
 
-    private int dpTopx(int dp, View view){
+    private int dpTopx(int dp, View view) {
         float scale = view.getContext().getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5f);
     }
@@ -144,6 +147,5 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         unregisterReceiver(myBroadcastReceiver);
     }
-
 
 }

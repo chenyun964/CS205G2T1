@@ -3,7 +3,9 @@ package com.example.serviceexample;
 import android.app.Service;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -24,6 +26,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Locale;
 
 
@@ -35,6 +38,7 @@ public class MyService extends Service {
     private static final int READ_TIMEOUT = 15000;
     private static final int CONNECTION_TIMEOUT = 15000;
 
+    private String ticker;
     private String token = "c8uo5g2ad3ibdduen72g"; // put your own token
 
     private final class ServiceHandler extends Handler {
@@ -44,9 +48,8 @@ public class MyService extends Service {
 
         @Override
         public void handleMessage(Message msg) {
-
+            ticker = msg.getData().getString("ticker");
             // url to get historical data
-            String ticker = String.valueOf(msg.obj).toUpperCase();
             String stringUrl = "https://finnhub.io/api/v1/stock/candle?symbol=" + ticker
                     + "&resolution=D&from=1625097601&to=1640995199&token=" + token;
             String result;
@@ -99,7 +102,7 @@ public class MyService extends Service {
                 e.printStackTrace();
             }
 
-            if(jsonArrayClose == null){
+            if (jsonArrayClose == null) {
                 Log.v("error", "error occurred");
             } else {
                 Log.v("close", String.valueOf(jsonArrayClose.length()));
@@ -122,11 +125,7 @@ public class MyService extends Service {
                     e.printStackTrace();
                 }
             }
-
             // broadcast message that download is complete
-            Intent intent = new Intent("DOWNLOAD_COMPLETE");
-            //intent.putStringArrayListExtra("test", (ArrayList<String>) test);
-            sendBroadcast(intent);
             stopSelf(msg.arg1);
         }
     }
@@ -141,16 +140,29 @@ public class MyService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        getContentResolver().delete(HistoricalDataProvider.CONTENT_URI, null, null);
-        Toast.makeText(this, "download starting", Toast.LENGTH_SHORT).show();
+        String ticker = intent.getStringExtra("ticker");
+        Intent newIntent = new Intent();
+        Cursor cursor = getContentResolver().query(HistoricalDataProvider.CONTENT_URI,
+                null, "name like '%" + ticker + "%'", new String[]{},
+                null);
 
-        String[] tickers = intent.getStringArrayExtra("tickers");
+        if (!cursor.moveToFirst()) {
+            Toast.makeText(this, "download starting", Toast.LENGTH_SHORT).show();
 
-        Message msg = serviceHandler.obtainMessage();
-        msg.arg1 = startId;
-        serviceHandler.sendMessage(msg);
-
+            Message msg = serviceHandler.obtainMessage();
+            Bundle b = new Bundle();
+            msg.arg1 = startId;
+            b.putString("ticker", ticker);
+            msg.setData(b);
+            serviceHandler.sendMessage(msg);
+            newIntent.setAction("DOWNLOAD_COMPLETE");
+        }
+        cursor.close();
+        newIntent.setAction("DATA_EXIST");
+        newIntent.putExtra("ticker", ticker);
+        sendBroadcast(newIntent);
         return START_STICKY;
+
     }
 
     @Override
